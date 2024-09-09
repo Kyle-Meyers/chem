@@ -141,10 +141,19 @@
 
         keyOrder = shuffle(Object.keys(quizData)).slice(0, numQuestions);
 
+        document.addEventListener('keydown', enterCheck);
+
         score = 0;
         currentIndex = 0;
         document.getElementById('quiz').innerHTML = '';
         loadQuestion();
+    }
+
+    function enterCheck() {
+        if (event.key === 'Enter') {
+            event.preventDefault()
+            checkAnswer(`${keyOrder[currentIndex]}`);
+        }
     }
 
     function loadQuestion() {  
@@ -192,7 +201,8 @@
                 resultHTML += `${item.question}: You answered "${item.userAnswer}", but the correct answer is "${item.correctAnswer}".<br>`;
             });
         }
-        
+
+        document.removeEventListener('keydown', enterCheck);
         document.getElementById('quiz').innerHTML = resultHTML;
     }
 
