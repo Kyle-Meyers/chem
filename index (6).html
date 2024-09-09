@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemistry Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        select, input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .question {
+            margin: 15px 0 10px 0;
+        }
+        .result {
+            font-weight: bold;
+            color: #d9534f;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Chemistry Practice</h1>
+
+    <label for="mode">Select Mode:</label>
+    <select id="mode">
+        <option value="symbolToElement">Symbol to Element</option>
+        <option value="elementToSymbol">Element to Symbol</option>
+    </select>
+
+    <label for="numQuestions">How many questions do you want to answer:</label>
+    <input type="number" id="numQuestions" min="1" max="50" placeholder="Enter number of questions">
+
+    <button onclick="startQuiz()">Start Quiz</button>
+
+    <div id="quiz"></div>
+</div>
+
+<script>
+    const data = {
+        'al': 'aluminum',
+        'sb': 'antimony',
+        'ar': 'argon',
+        'as': 'arsenic',
+        'ba': 'barium',
+        'be': 'beryllium',
+        'bi': 'bismuth',
+        'b': 'boron',
+        'br': 'bromine',
+        'cd': 'cadmium',
+        'ca': 'calcium',
+        'c': 'carbon',
+        'cl': 'chlorine',
+        'cr': 'chromium',
+        'co': 'cobalt',
+        'cu': 'copper',
+        'f': 'fluorine',
+        'au': 'gold',
+        'he': 'helium',
+        'h': 'hydrogen',
+        'i': 'iodine',
+        'fe': 'iron',
+        'kr': 'krypton',
+        'pb': 'lead',
+        'li': 'lithium',
+        'mg': 'magnesium',
+        'mn': 'manganese',
+        'hg': 'mercury',
+        'ne': 'neon',
+        'ni': 'nickel',
+        'n': 'nitrogen',
+        'o': 'oxygen',
+        'p': 'phosphorus',
+        'pt': 'platinum',
+        'k': 'potassium',
+        'ra': 'radon',
+        'se': 'selenium',
+        'ag': 'silver',
+        'na': 'sodium',
+        'si': 'silicon',
+        'sr': 'strontium',
+        's': 'sulfur',
+        'sn': 'tin',
+        'ti': 'titanium',
+        'u': 'uranium',
+        'xe': 'xenon',
+        'zn': 'zinc'
+    };
+
+    let quizData = {};
+    let score = 0;
+    let currentIndex = 0;
+    let keyOrder = [];
+
+    function startQuiz() {
+        const mode = document.getElementById('mode').value;
+        const numQuestions = parseInt(document.getElementById('numQuestions').value);
+        incorrectAnswers = [];
+
+        if (isNaN(numQuestions) || numQuestions < 1 || numQuestions > Object.keys(data).length) {
+            alert('Please enter a valid number of questions.');
+            return;
+        }
+
+        quizData = mode === 'elementToSymbol'
+            ? Object.fromEntries(Object.entries(data).map(([k, v]) => [v, k]))
+            : data;
+
+        keyOrder = shuffle(Object.keys(quizData)).slice(0, numQuestions);
+
+        score = 0;
+        currentIndex = 0;
+        document.getElementById('quiz').innerHTML = '';
+        loadQuestion();
+    }
+
+    function loadQuestion() {  
+        if (currentIndex >= keyOrder.length) {
+            displayResults();
+            return;
+        }
+
+        const questionKey = keyOrder[currentIndex];
+        const questionHTML = `
+            <div class="question">
+                <label>${capitalize(questionKey)}:</label>
+                <input type="text" id="answerInput">
+                <button onclick="checkAnswer('${questionKey}')">Submit</button>
+            </div>
+            <p id="feedback"></p>
+        `;
+
+        document.getElementById('quiz').innerHTML = questionHTML;
+    }
+
+    function checkAnswer(key) {
+        const answer = document.getElementById('answerInput').value.trim().toLowerCase();
+        const correctAnswer = quizData[key];
+
+        if (answer !== correctAnswer) {
+            incorrectAnswers.push({question: capitalize(key), correctAnswer: correctAnswer, userAnswer: answer});
+        } else {
+            score += 1;
+        }
+
+        currentIndex++;
+        loadQuestion()
+    }
+
+    function displayResults() {
+        resultHTML = `
+            <h3>Final Score: ${score}/${keyOrder.length}</h3>
+            <p>${(score / keyOrder.length * 100).toFixed(2)}%</p>
+        `;
+
+        if (incorrectAnswers.length > 0) {
+            resultHTML += `<b>Incorrect Answers:</b><br>`;
+            incorrectAnswers.forEach(item => {
+                resultHTML += `${item.question}: You answered "${item.userAnswer}", but the correct answer is "${item.correctAnswer}".<br>`;
+            });
+        }
+        
+        document.getElementById('quiz').innerHTML = resultHTML;
+    }
+
+    function shuffle(array) {
+        let currentIndex = array.length, randomIndex;
+
+        while (currentIndex != 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+
+        return array;
+    }
+
+    function capitalize(s) {
+        if (s.length > 1) {
+            return s.charAt(0).toUpperCase() + s.slice(1);
+        }
+        else {
+            return s.toUpperCase();
+        }
+    }
+</script>
+
+</body>
+</html>
