@@ -176,17 +176,19 @@
     }
 
     function checkAnswer(key) {
-        const answer = document.getElementById('answerInput').value.trim().toLowerCase();
-        const correctAnswer = quizData[key];
+        let answer = document.getElementById('answerInput').value.trim();
+        let correctAnswer = quizData[key];
 
         if (document.getElementById("mode").value === 'elementToSymbol') {
-            document.getElementById('answerInput').value.trim();
             if (correctAnswer.length === 1) {
                 correctAnswer = correctAnswer.toUpperCase();
             }
             else {
                 correctAnswer = correctAnswer[0].toUpperCase() + correctAnswer[1];
             }
+        }
+        else {
+            answer = answer.toLowerCase();
         }
 
         if (answer !== correctAnswer) {
