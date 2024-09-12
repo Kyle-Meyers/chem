@@ -179,6 +179,16 @@
         const answer = document.getElementById('answerInput').value.trim().toLowerCase();
         const correctAnswer = quizData[key];
 
+        if (document.getElementById("mode").value === 'elementToSymbol') {
+            document.getElementById('answerInput').value.trim();
+            if (correctAnswer.length === 1) {
+                correctAnswer = correctAnswer.toUpperCase();
+            }
+            else {
+                correctAnswer = correctAnswer[0].toUpperCase() + correctAnswer[1];
+            }
+        }
+
         if (answer !== correctAnswer) {
             incorrectAnswers.push({question: capitalize(key), correctAnswer: correctAnswer, userAnswer: answer});
         } else {
